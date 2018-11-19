@@ -8,7 +8,6 @@
 
 		<script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
 		<script>
-			// Initialize Firebase
 			var config = {
 				apiKey: "AIzaSyDmA4d15qKTrmjJSzELPzYlZ19s-CH73ME",
 				authDomain: "yafeng-b69f1.firebaseapp.com",
@@ -41,7 +40,7 @@
 					此頁面開著才能收到警報，縮小視窗也可。<br>
 					警報區間為週一至週五09:00~17:00<br>
 					（午休12:00~13:00除外）<br>
-					每月至多兩個警報，警報間隔至少一週。<br>
+					每月至多兩個警報，兩警報間隔至少3天。<br>
 					現在時間：{{date | formatDate}}<br>
 					本月已警報次數：0/2
 				</p>
@@ -85,6 +84,7 @@
 					var _this = this;
 					this.timer = setInterval(function () {
 						_this.date = new Date(); //修改date
+						// <<<<<此處待新增>>>>>
 					},1000);
 				},
 				beforeDestory:function () { //清除定時器
@@ -104,10 +104,10 @@
 			var db = firebase.firestore();
 			db.collection("Yafeng").doc("AlarmTime").get().then(function(doc) {
 				if (doc.exists) {
-					console.log("最近更新警報時間（年月）為", doc.data().UpdateYM);
+					console.log("最近更新警報時間為", doc.data().UpdateYM);
 					// 確認本月是否已有警報
 					var date = new Date();
-					if (date.getFullYear()+month.toString() == doc.data().UpdateYM) {
+					if (year+month.toString() == doc.data().UpdateYM) {
 						console.log("判斷本月已有更新警報");
 						// 提取警報12
 						Explosion1 = doc.data().Explosion1;
@@ -115,6 +115,7 @@
 					} else {
 						console.log("判斷本月沒有更新警報，將進行更新...");
 						// 如果本月沒有更新警報
+						// 跑亂數得日期+小時+分鐘
 						var Explosion = function () {
 							var max = new Date(year,month,0).getDate(); //取得本月最後一天
 							var min = day; //取得今日日期
@@ -133,11 +134,35 @@
 							return ExplosionDay.toString()+ExplosionHours.toString()+ExplosionMinutes.toString();
 						};
 						
-						// 如果亂數出來的時間在現在時間之前，則再換亂數
+						// 如果亂數出來的時間在現在時間之前，則再換
 						do {
-							var a = Explosion();
-						} while (a<=day.toString()+hours.toString()+minutes.toString());
-						console.log(a);
+							Explosion1 = Explosion();
+						} while (Explosion1<=day.toString()+hours.toString()+minutes.toString());
+						// 至此產出Explosion1
+
+						// 如果本月只剩六天，那就只用一個警報
+						if (day>24) {
+							Explosion2 = "999999";
+						} else {
+							// 兩警報間隔3天以上
+							do { 
+								// 如果亂數出來的時間在現在時間之前，則再換
+								do {
+									Explosion2 = Explosion();
+								} while (Explosion2<=day.toString()+hours.toString()+minutes.toString());
+							} while (Math.abs(Number(Explosion1.substr(0,2))-Number(Explosion2.substr(0,2)))<3);
+						}
+						// 至此產出Explosion2
+
+						// 開始寫入DB
+						db.collection("Yafeng").doc("AlarmTime").update({
+							UpdateYM: year+month.toString(),
+							Explosion1: Explosion1,
+							Explosion2: Explosion2
+						})
+						.then(function() {
+							console.log("更新本月警報時間完成!");
+						});
 					}
 				} else {
 					console.log("找不到UpdateYM");
@@ -147,15 +172,7 @@
 			});
 
 
-			// 開始寫入FB
-			// db.collection("Yafeng").doc(AlarmTime").update({
-			// 	UpdateYM: "201811",
-			// 	Explosion1: "201034",
-			// 	Explosion2: "251656"
-			// })
-			// .then(function() {
-			// 	console.log("更新本月警報完成!");
-			// });
+			
 		</script>
 
 
