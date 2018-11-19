@@ -59,6 +59,7 @@
 		<script type="text/javascript">
 			var Explosion1 = "";
 			var Explosion2 = "";
+			var ExplosionOpen = false;
 
 			var padDate = function (value) {    //在月份、日期、小時，如小於10補0
 				return value<10?'0'+value:value;
@@ -77,6 +78,13 @@
 						var hours = padDate(date.getHours());
 						var minutes = padDate(date.getMinutes());
 						var seconds = padDate(date.getSeconds());
+
+						// <<<<<此處待新增警報事件>>>>>
+						if (day.toString()+hours.toString()+minutes.toString()==Explosion1) {
+							console.log("!!!!!!!!!!!!!!");
+							ExplosionOpen = true;
+						}
+
 						return year+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;
 					}
 				},
@@ -84,7 +92,6 @@
 					var _this = this;
 					this.timer = setInterval(function () {
 						_this.date = new Date(); //修改date
-						// <<<<<此處待新增警報事件>>>>>
 					},1000);
 				},
 				beforeDestory:function () { //清除定時器
