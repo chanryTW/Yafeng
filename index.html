@@ -19,8 +19,8 @@
 			firebase.initializeApp(config);
 		</script>
 
-		<!-- <script src="./jquery-3.3.1.min.js"></script>	 -->
-		<!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script> -->
+		<script src="./jquery-3.3.1.min.js"></script>	
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 		<link href="./css/style.css" rel="stylesheet" type="text/css">
@@ -32,7 +32,7 @@
 
 		<div id="app" class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
 			<header class="mb-auto"></header>
-		
+			
 			<main role="main" class="inner cover">
 				<img class="animated fadeInDown delay-07s" src="/img/alarm.png" alt="">
 				<h1 class="animated fadeInDown delay-07s">隨機警報鬧鐘</h1>
@@ -45,18 +45,54 @@
 					本月已警報次數：0/2
 				</p>
 				<p class="lead animated fadeInUp delay-1s">
-					<a href="#" class="btn btn-lg btn-secondary">修改設定</a>
+					<a href="#" class="btn btn-lg btn-secondary" data-toggle="modal" data-target="#exampleModal">修改設定</a>
 				</p>
 			</main>
-		
+					
+			<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">修改設定</h5>
+						</div>
+						<div class="modal-body">
+							<form>
+								<div class="form-group">
+									<label for="recipient-name" class="col-form-label">帳號</label>
+									<input type="text" class="form-control" id="recipient-name">
+								</div>
+								<div class="form-group">
+									<label for="message-text" class="col-form-label">密碼</label>
+									<input type="text" class="form-control" id="recipient-name">
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+							<button type="button" class="btn btn-primary ">登入</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<footer class="mastfoot mt-auto">
 				<div class="inner">
-				<p>Ver 1.0.2 © 2018 Chanry All Rights Reserved</p>
+				<p>Ver 1.0.3 © 2018 Chanry All Rights Reserved</p>
 				</div>
 			</footer>
 		</div>
 
 		<script type="text/javascript">
+			$('#exampleModal').on('show.bs.modal', function (event) {
+				var button = $(event.relatedTarget) // Button that triggered the modal
+				var recipient = button.data('whatever') // Extract info from data-* attributes
+				// If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+				// Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+				var modal = $(this)
+				modal.find('.modal-title').text('New message to ' + recipient)
+				modal.find('.modal-body input').val(recipient)
+			})
+
 			var Explosion1 = "";
 			var Explosion2 = "";
 			var ExplosionOpen = false;
