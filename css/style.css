@@ -1,38 +1,48 @@
+.btn-secondary,
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #333;
+  text-shadow: none; /* Prevent inheritance from `body` */
+  background-color: #fff;
+  border: .05rem solid #fff;
+}
+
+html,
 body {
-	background:#141414;
-	font-family: '微軟正黑體', sans-serif;
-	font-weight:normal;
-	margin:0;
+  height: 100%;
+  background-color: #333;
+  font-family: '微軟正黑體', sans-serif;
 }
 
-.header{
-	text-align:center;
-	background:url(../img/002.png) left top repeat;
-	padding:280px 0;
+body {
+  display: -ms-flexbox;
+  display: flex;
+  color: #fff;
+  text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
+  box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
 }
 
-.header h1{
-	font-size:50px;
-	font-weight:400;
-	letter-spacing: -1px;
-	margin:0 0 22px 0 ;
-	color:#fff;
+
+/*
+ * Cover
+ */
+.cover {
+  padding: 0 1.5rem;
+}
+.cover .btn-lg {
+  padding: .75rem 1.25rem;
+  font-weight: 700;
+}
+.cover-container {
+  max-width: 42em;
 }
 
-.we-create{
-	padding:0;
-	margin:35px 0 55px;
-}
 
-.we-create li{
-	display:inline-block;
-	font-family: 'Montserrat',sans-serif;
-	font-size:14px;
-	color: #bcbcbc;
-	text-transform: uppercase;
-	font-weight: 400;
-	margin:0 5px 0 0;
-	padding:0 0 0 15px;
+/*
+ * 頁尾
+ */
+.mastfoot {
+  color: rgba(255, 255, 255, .5);
 }
 
 
