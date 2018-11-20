@@ -18,6 +18,19 @@ var db = firebase.firestore();
 var snd = new Audio("balarm.wav");
 snd.loop = true;
 
+//在月份、日期、小時，如小於10補0
+var padDate = function (value) {
+    return value<10?'0'+value:value;
+};
+
+var date = new Date();
+var year = date.getFullYear();
+var month = padDate(date.getMonth()+1);
+var day = padDate(date.getDate());
+var hours = padDate(date.getHours());
+var minutes = padDate(date.getMinutes());
+var seconds = padDate(date.getSeconds());
+
 // 啟動警報
 function ExplosionStart(NowTime) {
     console.log("啟動警報");
@@ -75,9 +88,21 @@ function ExplosionUpdate() {
         var total = 0;
         if (doc.data().ExplosionOpen1==true) {
             count +=1;
-        } 
+        } else if (doc.data().Explosion1<day.toString()+hours.toString()+minutes.toString()) {
+            db.collection("Yafeng").doc("AlarmTime").update({
+                ExplosionOpen1: true
+            })
+            .then(function() {
+            });
+        }
         if (doc.data().ExplosionOpen2==true) {
             count +=1;
+        } else if (doc.data().Explosion2<day.toString()+hours.toString()+minutes.toString()) {
+            db.collection("Yafeng").doc("AlarmTime").update({
+                ExplosionOpen2: true
+            })
+            .then(function() {
+            });
         }
         if (doc.data().Explosion1!="999999") {
             total +=1;
@@ -99,11 +124,6 @@ function StopBtnClick() {
     // 關閉警報
     ExplosionStop();
 }
-
-//在月份、日期、小時，如小於10補0
-var padDate = function (value) {
-    return value<10?'0'+value:value;
-};
 
 var app = new Vue({
     el:'#app',
@@ -153,14 +173,6 @@ var app = new Vue({
 
 })
 
-var date = new Date();
-var year = date.getFullYear();
-var month = padDate(date.getMonth()+1);
-var day = padDate(date.getDate());
-var hours = padDate(date.getHours());
-var minutes = padDate(date.getMinutes());
-var seconds = padDate(date.getSeconds());
-
 // 更新後台記錄
 var isIE = navigator.userAgent.search("MSIE") > -1;
 var isIE7 = navigator.userAgent.search("MSIE 7") > -1;
@@ -194,7 +206,7 @@ db.collection("Record").doc(year+'-'+month+'-'+day+' '+hours+':'+minutes+':'+sec
 // 更新資料
 db.collection("Yafeng").doc("AlarmTime").onSnapshot(function(doc) {
     console.log("更新資料中...");
-    ExplosionUpdate();
+    ExplosionUpdate(); // 更新警報次數
     if (doc.exists) {
         console.log("最近更新警報時間為", doc.data().UpdateYM);
         // 確認本月是否已有警報
