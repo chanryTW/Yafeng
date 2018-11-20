@@ -261,6 +261,4 @@ db.collection("Yafeng").doc("AlarmTime").onSnapshot(function(doc) {
     } else {
         console.log("找不到UpdateYM");
     }
-}).catch(function(error) {
-    console.log("讀取UpdateYM失敗：", error);
-});
+})
