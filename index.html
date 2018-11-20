@@ -32,7 +32,9 @@
 
 		<div id="app" class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
 			<header class="mb-auto"></header>
-			
+
+			<button id="StopBtn" type="button" onclick="StopBtnClick()" class="btn btn-warning btn-lg btn-block" style="display: none;">關閉警報</button>
+
 			<main role="main" class="inner cover">
 				<img class="animated fadeInDown delay-07s" src="/img/alarm.png" alt="">
 				<h1 class="animated fadeInDown delay-07s">隨機警報鬧鐘</h1>
@@ -45,10 +47,10 @@
 					本月已警報次數：0/2
 				</p>
 				<p class="lead animated fadeInUp delay-1s">
-					<a href="#" class="btn btn-lg btn-secondary" data-toggle="modal" data-target="#exampleModal">修改設定</a>
+					<a id="ChangeBtn" href="#" class="btn btn-lg btn-secondary" data-toggle="modal" data-target="#exampleModal">修改設定</a>
 				</p>
 			</main>
-					
+			
 			<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered" role="document">
 					<div class="modal-content">
@@ -69,7 +71,7 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
-							<button type="button" class="btn btn-primary ">登入</button>
+							<button type="button" class="btn btn-dark ">登入</button>
 						</div>
 					</div>
 				</div>
@@ -77,12 +79,13 @@
 
 			<footer class="mastfoot mt-auto">
 				<div class="inner">
-				<p>Ver 1.0.3 © 2018 Chanry All Rights Reserved</p>
+				<p>Ver 1.0.4 © 2018 Chanry All Rights Reserved</p>
 				</div>
 			</footer>
 		</div>
 
 		<script type="text/javascript">
+			// 修改設定
 			$('#exampleModal').on('show.bs.modal', function (event) {
 				var button = $(event.relatedTarget) // Button that triggered the modal
 				var recipient = button.data('whatever') // Extract info from data-* attributes
@@ -96,10 +99,36 @@
 			var Explosion1 = "";
 			var Explosion2 = "";
 			var ExplosionOpen = false;
+			
+			// 啟動警報
+			function ExplosionStart() {
+				console.log("啟動警報");
+				ExplosionOpen = true;
+				document.styleSheets[0].addRule('#app::before','animation-duration:1.5s;animation-iteration-count:infinite'); //開始閃紅燈
+				document.getElementById("StopBtn").style.display="block"; //顯示停止按鈕
+				document.getElementById("ChangeBtn").style.display="none"; //不顯示修改按鈕
+			}
 
-			var padDate = function (value) {    //在月份、日期、小時，如小於10補0
+			// 關閉警報
+			function ExplosionStop() {
+				console.log("關閉警報");
+				ExplosionOpen = false;
+				document.styleSheets[0].addRule('#app::before','animation-duration:1.5s;animation-iteration-count:0'); //停止閃紅燈
+				document.getElementById("StopBtn").style.display="none"; //不顯示停止按鈕
+				document.getElementById("ChangeBtn").style.display="inline-block"; //顯示修改按鈕
+			}
+
+			//如果關閉警報被點擊
+			function StopBtnClick() {
+				// 關閉警報
+				ExplosionStop();
+			}
+
+			//在月份、日期、小時，如小於10補0
+			var padDate = function (value) {
 				return value<10?'0'+value:value;
 			};
+
 			var app = new Vue({
 				el:'#app',
 				data:{
@@ -115,12 +144,19 @@
 						var minutes = padDate(date.getMinutes());
 						var seconds = padDate(date.getSeconds());
 
-						// <<<<<此處待新增警報事件>>>>>
-						if (day.toString()+hours.toString()+minutes.toString()==Explosion1) {
-							console.log("!!!!!!!!!!!!!!");
-							ExplosionOpen = true;
+						// <<<<<警報事件>>>>>
+						if (day.toString()+hours.toString()+minutes.toString()==Explosion1) { //如果現在時間符合警報時間
+							if (ExplosionOpen==false) { //如果警報是關閉的
+								// 啟動警報
+								ExplosionStart();
+							}
+						} else { //如果現在時間不符合警報時間
+							if (ExplosionOpen==true) { //檢查警報是否開著，如果開著就讓它停止
+								// 關閉警報
+								ExplosionStop();
+							}
 						}
-
+						
 						return year+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;
 					}
 				},
@@ -135,6 +171,7 @@
 						clearInterval(this.timer);  //在關閉前清除定時器
 					}
 				}
+
 			})
 			
 			var date = new Date();
