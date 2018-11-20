@@ -173,40 +173,41 @@ var app = new Vue({
 
 })
 
-// 更新後台記錄
-var isIE = navigator.userAgent.search("MSIE") > -1;
-var isIE7 = navigator.userAgent.search("MSIE 7") > -1;
-var isFirefox = navigator.userAgent.search("Firefox") > -1;
-var isOpera = navigator.userAgent.search("Opera") > -1;
-var isSafari = navigator.userAgent.search("Safari") > -1;
-if (isIE7) {
-    browser = 'IE7';
-}
-if (isIE) {
-    browser = 'IE';
-}
-if (isFirefox) {
-    browser = 'Firefox';
-}
-if (isOpera) {
-    browser = 'Opera';
-}
-if (isSafari) {
-    browser = 'Safari/Chrome';
-}
-db.collection("Record").doc(year+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds).set({
-    Browser: browser
-})
-.then(function(docRef) {
-})
-.catch(function(error) {
-    console.error("記錄錯誤：", error);
-});
-
 // 更新資料
 db.collection("Yafeng").doc("AlarmTime").onSnapshot(function(doc) {
     console.log("更新資料中...");
     ExplosionUpdate(); // 更新警報次數
+
+    // 更新後台記錄
+    var isIE = navigator.userAgent.search("MSIE") > -1;
+    var isIE7 = navigator.userAgent.search("MSIE 7") > -1;
+    var isFirefox = navigator.userAgent.search("Firefox") > -1;
+    var isOpera = navigator.userAgent.search("Opera") > -1;
+    var isSafari = navigator.userAgent.search("Safari") > -1;
+    if (isIE7) {
+        browser = 'IE7';
+    }
+    if (isIE) {
+        browser = 'IE';
+    }
+    if (isFirefox) {
+        browser = 'Firefox';
+    }
+    if (isOpera) {
+        browser = 'Opera';
+    }
+    if (isSafari) {
+        browser = 'Safari/Chrome';
+    }
+    db.collection("Record").doc(year+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds).set({
+        Browser: browser
+    })
+    .then(function(docRef) {
+    })
+    .catch(function(error) {
+        console.error("記錄錯誤：", error);
+    });
+
     if (doc.exists) {
         console.log("最近更新警報時間為", doc.data().UpdateYM);
         // 確認本月是否已有警報
