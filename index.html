@@ -44,7 +44,7 @@
 					（午休12:00~13:00除外）<br>
 					每月至多兩個警報，兩警報間隔至少3天。<br>
 					現在時間：{{date | formatDate}}<br>
-					本月已警報次數：0/2
+					本月已警報次數：<span id="SpanCount">0/2</span>
 				</p>
 				<p class="lead animated fadeInUp delay-1s">
 					<a id="ChangeBtn" href="#" class="btn btn-lg btn-secondary" data-toggle="modal" data-target="#exampleModal">修改設定</a>
@@ -79,7 +79,7 @@
 
 			<footer class="mastfoot mt-auto">
 				<div class="inner">
-				<p>Ver 1.0.4 © 2018 Chanry All Rights Reserved</p>
+				<p>Ver 1.1.2 © 2018 Chanry All Rights Reserved</p>
 				</div>
 			</footer>
 		</div>
@@ -99,10 +99,36 @@
 			var Explosion1 = "";
 			var Explosion2 = "";
 			var ExplosionOpen = false;
+			var ExplosionCheck = "322561";
+			var db = firebase.firestore();
 			
 			// 啟動警報
-			function ExplosionStart() {
+			function ExplosionStart(NowTime) {
 				console.log("啟動警報");
+				ExplosionCheck = NowTime; //標示這個時間點已啟動過
+				console.log(Explosion1,Explosion2,NowTime);
+				switch(NowTime)
+				{
+					case Explosion1:
+						db.collection("Yafeng").doc("AlarmTime").update({
+							ExplosionOpen1: true
+						})
+						.then(function() {
+							console.log("更新Explosion1狀態完成，標記為已警報");
+						});
+					break;
+					case Explosion2:
+						db.collection("Yafeng").doc("AlarmTime").update({
+							ExplosionOpen2: true
+						})
+						.then(function() {
+							console.log("更新Explosion2狀態完成，標記為已警報");
+						});
+					break;
+				}
+				// 更新警報次數
+				ExplosionUpdate();
+
 				ExplosionOpen = true;
 				document.styleSheets[0].addRule('#app::before','animation-duration:1.5s;animation-iteration-count:infinite'); //開始閃紅燈
 				document.getElementById("StopBtn").style.display="block"; //顯示停止按鈕
@@ -112,11 +138,40 @@
 			// 關閉警報
 			function ExplosionStop() {
 				console.log("關閉警報");
+
 				ExplosionOpen = false;
 				document.styleSheets[0].addRule('#app::before','animation-duration:1.5s;animation-iteration-count:0'); //停止閃紅燈
 				document.getElementById("StopBtn").style.display="none"; //不顯示停止按鈕
 				document.getElementById("ChangeBtn").style.display="inline-block"; //顯示修改按鈕
 			}
+
+			// 更新警報次數
+			function ExplosionUpdate() {
+				db.collection("Yafeng").doc("AlarmTime").get().then(function(doc) {
+				if (doc.exists) {
+					var count = 0;
+					var total = 0;
+					if (doc.data().ExplosionOpen1==true) {
+						count +=1;
+					} 
+					if (doc.data().ExplosionOpen2==true) {
+						count +=1;
+					}
+					if (doc.data().Explosion1!="999999") {
+						total +=1;
+					}
+					if (doc.data().Explosion2!="999999") {
+						total +=1;
+					}
+					document.getElementById("SpanCount").innerText = count+"/"+total;
+				} else {
+					console.log("找不到ExplosionOpen");
+				}
+				}).catch(function(error) {
+					console.log("讀取ExplosionOpen失敗：", error);
+				});
+			}
+			ExplosionUpdate();
 
 			//如果關閉警報被點擊
 			function StopBtnClick() {
@@ -143,12 +198,15 @@
 						var hours = padDate(date.getHours());
 						var minutes = padDate(date.getMinutes());
 						var seconds = padDate(date.getSeconds());
+						var NowTime = day.toString()+hours.toString()+minutes.toString();
 
 						// <<<<<警報事件>>>>>
-						if (day.toString()+hours.toString()+minutes.toString()==Explosion1) { //如果現在時間符合警報時間
-							if (ExplosionOpen==false) { //如果警報是關閉的
-								// 啟動警報
-								ExplosionStart();
+						if (NowTime==Explosion1||NowTime==Explosion2) { //如果現在時間符合警報時間
+							if (NowTime!=ExplosionCheck) { //檢查是不是沒有啟動過
+								if (ExplosionOpen==false) { //如果警報是關閉的
+									// 啟動警報
+									ExplosionStart(NowTime);
+								}
 							}
 						} else { //如果現在時間不符合警報時間
 							if (ExplosionOpen==true) { //檢查警報是否開著，如果開著就讓它停止
@@ -181,7 +239,7 @@
 			var hours = padDate(date.getHours());
 			var minutes = padDate(date.getMinutes());
 
-			var db = firebase.firestore();
+			
 			db.collection("Yafeng").doc("AlarmTime").get().then(function(doc) {
 				if (doc.exists) {
 					console.log("最近更新警報時間為", doc.data().UpdateYM);
